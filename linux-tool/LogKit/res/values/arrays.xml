@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="save_location_options">
+        <item>@string/internal_SD</item>
+        <item>@string/external_SD</item>
+    </string-array>
+    <string-array name="save_location_options_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
+</resources>

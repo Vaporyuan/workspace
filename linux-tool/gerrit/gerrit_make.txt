@@ -1,0 +1,284 @@
+/*                                                                        
+ * Copyright (c) UROVO Company             　　　　　　　     
+ *                 深圳市优博讯有限公司  版权所有 
+ *                                                                        
+ * PROPRIETARY RIGHTS of UROVO Company are involved in the  　　　　　　 
+ * subject matter of this material.  All manufacturing, reproduction, use,
+ * and sales rights pertaining to this subject matter are governed by the 
+ * license agreement.  The recipient of this software implicitly accepts  
+ * the terms of the license.                                              
+ * 本软件文档资料是优博讯公司的资产,任何人士阅读和使用本资料必须获得        
+ * 相应的书面授权,承担保密责任和接受相应的法律约束.   
+ * OTA_MAKE说明
+ * FileName:OS_Make_OTA.sh   
+ * Function:根据传入参数获取原包,制作OTA包并上传到服务器     
+ * Version:V0.1      
+ * Author:yuanwei      
+ * Date:2018-10-31                    
+ */                                                                        
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+1.Java环境 jdk1.8 安装配置
+java -version
+
+2.git环境
+git --version
+
+3.gerrit环境
+下载：Gerrit 2.12.4 https://www.gerritcodereview.com/download/gerrit-2.12.4.war
+
+4.apache2环境
+sudo apt-get remove --purge apache2
+
+安装：sudo apt-get install apache2 
+验证：sudo /etc/init.d/apache2 start
+
+5.gerrit管理帐号(可选，使用独立账号配置gerrit)
+
+
+二、安装与配置gerrit
+
+https://blog.csdn.net/shihai1991/article/details/52483830
+1.配置gerrit
+默认安装：java -jar gerrit-2.15.6.war init -d review_site
+初始化：  java -jar gerrit-2.15.6.war init --batch -d ~/review_site
+
+2.修改默认配置
+sudo vim ~/review_site/etc/gerrit.config
+
+
+[auth]
+	type = OPENID
+改为
+[auth]
+        type = HTTP
+
+http://192.168.8.171
+
+3.配置gerrit账户密码
+touch /etc/apache2/passwords
+
+sudo ./review_site/bin/gerrit.sh start
+sudo ./review_site/bin/gerrit.sh restart
+
+4.启动gerrit&启动apache2
+sudo /etc/init.d/apache2 start
+sudo /etc/init.d/apache2 restart
+
+
+cd /var/log/apache2/
+
+cd /etc/apache2/mods-enabled
+sudo ln -s ../mods-available/proxy.load
+sudo ln -s ../mods-available/proxy.conf
+sudo ln -s ../mods-available/proxy_http.load
+sudo ln -s ../mods-available/proxy_balancer.conf
+sudo ln -s ../mods-available/proxy_balancer.load
+sudo ln -s ../mods-available/rewrite.load
+sudo ln -s ../mods-available/socache_shmcb.load
+sudo ln -s ../mods-available/slotmem_shm.load
+//使用后无法启动(不配置也可以使用)
+ln -s ../mods-available/ssl.conf
+ln -s ../mods-available/ssl.load
+
+
+sudo vim /etc/apache2/sites-enabled/gerrit-httpd.conf
+cd /etc/apache2
+sudo a2ensite gerrit-httpd.conf
+
+5.添加用户
+sudo htpasswd -b /etc/apache2/passwords admin 123456(管理员)
+sudo htpasswd -b /etc/apache2/passwords zhitao.ju 123456(普通用户)
+
+
+
+6.邮箱验证
+发送服务器名称： smtp.urovo.com
+端口：       25
+用户名：wei.yuan_urovo.com
+
+接收：  pop.urovo.com 110
+
+
+gerrit页面是不允许logout的，所以需要关闭web页面清理缓存，才能登录其他用户
+
+ssh -p 29418 admin@my_server gerrit gsql
+
+//添加pub key 后验证
+ssh admin@192.168.8.171 -p 29418
+//拉取代吗
+git clone http://192.168.8.171:8081/demo-20181211
+git clone ssh://admin@192.168.8.171:29418/demo-20181211
+
+
+
+192.168.8.215 
+ yuanwei              
+ wYt562W8  
+
+
+//插件
+https://gerrit-ci.gerritforge.com/view/Plugins-stable-2.15/job/plugin-reviewers-bazel-stable-2.15/
+
+git clone ssh://yuanwei@192.168.8.215:29418/Ucode_9.0.git
+
+
+
+上传本地仓库
+git push ssh://admin@192.168.8.171:29418/demo-20181211  *:*
+
+
+git config commit.template ~/commit-msg.git/msg.template
+ln -s ~/commit-msg.git/commit-msg .git/hooks/
+// 生成Change-Id
+gitdir=$(git rev-parse --git-dir); scp -p -P 29418 admin@192.168.8.171:hooks/commit-msg ${gitdir}/hooks/
+
+
+
+git push origin master:refs/for/master
+
+
+smtpServer = smtp.urovo.com
+
+64 bytes from smtp.hkham.net (218.103.102.1): icmp_seq=1 ttl=47 time=13.9 ms
+
+wei.yuan@urovo.com
+
+zhitao.ju@urovo.com
+
+
+//权限配置
+https://blog.csdn.net/ujm7418529631/article/details/79226621
+
+
+##########################################################################
+https://blog.csdn.net/shihai1991/article/details/52483830
+https://blog.csdn.net/ljchlx/article/details/22277311
+https://www.cnblogs.com/tesky0125/p/5877536.html
+
+https://www.cnblogs.com/zndxall/p/9007919.html //gerrit设置非小组成员禁止下载代码
+
+yuanwei@yuanwei-ubuntu:~$ cat ~/review_site/etc/gerrit.config
+[gerrit]
+	basePath = git
+	serverId = 2a1875aa-f147-49d9-8686-02c96f666540
+	canonicalWebUrl = http://192.168.8.171
+[database]
+	type = h2
+	database = /home/yuanwei/review_site/db/ReviewDB
+[index]
+	type = LUCENE
+[auth]
+	type = HTTP
+[oauth]
+    allowEditFullName = true
+    allowRegisterNewEmail = true
+[receive]
+	enableSignedPush = false
+[sendemail]
+	enable = true
+	smtpServer = 218.103.102.1
+	smtpServerPort = 25
+	smtpEncryption = 
+	sslVerify = false
+	smtpUser = gerrit_urovo.com
+	smtpPass = gerrit2018!
+	from = gerrit@urovo.com
+
+[container]
+	user = yuanwei
+	javaHome = /usr/lib/jvm/java-8-openjdk-amd64/jre
+[sshd]
+	listenAddress = *:29418
+[httpd]
+	listenUrl = http://*:8081/
+[cache]
+	directory = cache
+[gitweb]
+    type = gitweb
+    cgi = /usr/lib/cgi-bin/gitweb.cgi
+
+yuanwei@yuanwei-ubuntu:/etc/apache2$ cat ports.conf
+# If you just change the port or add more ports here, you will likely also
+# have to change the VirtualHost statement in
+# /etc/apache2/sites-enabled/000-default.conf
+
+NameVirtualHost *:80
+Listen 80
+Listen 8080
+
+<IfModule ssl_module>
+	Listen 443
+</IfModule>
+
+<IfModule mod_gnutls.c>
+	Listen 443
+</IfModule>
+
+# vim: syntax=apache ts=4 sw=4 sts=4 sr noet
+
+
+yuanwei@yuanwei-ubuntu:/etc/apache2$ cat sites-available/gerrit-httpd.conf 
+
+NameVirtualHost 192.168.8.171:80
+<VirtualHost 192.168.8.171:80>
+    ServerName 192.168.8.171
+
+    ProxyRequests Off
+    ProxyVia Off
+    ProxyPreserveHost On
+    AllowEncodedSlashes On
+    RewriteEngine On
+
+    <Proxy *>
+          Order deny,allow
+          Allow from all
+    </Proxy>
+
+    <Location /login/>
+        AuthType Basic
+        AuthName "Gerrit Code Review"
+        Require valid-user
+        AuthUserFile /etc/apache2/passwords
+    </Location>
+
+    ProxyPass / http://127.0.0.1:8081/
+    ProxyPassReverse / http://127.0.0.1:8081/
+</VirtualHost>
+
+    ProxyPass /r/ http://127.0.0.1:8081/r/ nocanon
+    https://blog.csdn.net/luanhongjun/article/details/52213563
+##########################################################################
+
+
+
+
+192.168.8.215
+vapor/Vapor
+
+
+https://www.cnblogs.com/eastnapoleon/p/6497802.html
+sudo apt-get install gitweb
+默认gitweb是安装到apache目录中的，也就是/var/www/目录下会有一个git文件夹，专门用来显示gitweb页面
+
+/etc/gitweb.conf
+$projectroot = "/home/gerrit/gerrit_site/git"
+
+dpkg -L gitweb
+
+192.168.8.36  gcz
+
+Gerrit 2.12.x无法view diff
+https://blog.csdn.net/luanhongjun/article/details/52213563
+然后试一下http://192.168.8.215:80
+
+
+gerrit@192.168.8.215
+用户名：gerrit
+密码：Gurovocode
+
+admin/adminu
+
+git push ssh://admin@192.168.8.171:29418/demo_2019-02-21  *:*
+

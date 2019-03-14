@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory 
+        android:key="adb_log"
+        android:title="@string/adb_tag" >
+        <SwitchPreference
+            android:key="main_tag"
+            android:persistent="true"
+            android:title="@string/main_tag" />
+        <SwitchPreference
+            android:key="radio_tag"
+            android:persistent="true"
+            android:title="@string/radio_tag" />
+        <SwitchPreference
+            android:key="system_tag"
+            android:persistent="true"
+            android:title="@string/system_tag" />
+        <SwitchPreference
+            android:key="event_tag"
+            android:persistent="true"
+            android:title="@string/event_tag" />
+    </PreferenceCategory>
+    <PreferenceCategory 
+        android:key="qxdm_log"
+        android:title="@string/QXDM_tag" >
+        <SwitchPreference
+            android:key="qxdm_tag"
+            android:persistent="true"
+            android:title="@string/QXDM_tag" />
+    </PreferenceCategory>
+    <PreferenceCategory 
+        android:key="ip_log"
+        android:title="@string/IP_tag" >
+        <SwitchPreference
+            android:key="ip_tag"
+            android:persistent="true"
+            android:title="@string/IP_tag" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/state_logs_tag" android:key="state_log">
+        <SwitchPreference
+            android:key="dmesg_tag"
+            android:persistent="true"
+            android:title="@string/Dmesg_tag" />
+        <SwitchPreference
+            android:key="dumpstate_tag"
+            android:persistent="true"
+            android:title="@string/dumpstate_tag" />
+        <SwitchPreference
+            android:key="dumpsys_tag"
+            android:persistent="true"
+            android:title="@string/dumpsys_tag" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:key="crash_log"
+        android:title="@string/Crash_tag" >
+        <SwitchPreference
+            android:key="crash_tag"
+            android:persistent="true"
+            android:title="@string/Crash_tag" />
+    </PreferenceCategory>
+
+
+</PreferenceScreen>

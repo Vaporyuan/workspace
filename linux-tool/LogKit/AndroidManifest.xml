@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    coreApp="true"
+    package="com.meig.logkit"
+    android:persistent="true"
+    android:sharedUserId="android.uid.system"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="21"
+        android:targetSdkVersion="23" />
+
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_LOGS" />
+    <uses-permission android:name="android.permission.WRITE_MEDIA_STORAGE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
+
+    <application
+        android:allowBackup="false"
+        android:label="@string/app_name"
+        android:requiredForAllUsers="true"
+        android:theme="@android:style/Theme.Material.Light" >
+        <uses-library
+            android:name="com.qualcomm.qcrilhook"
+            android:required="true" />
+
+        <activity
+            android:name="com.meig.logkit.LogkitSetings"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            </intent-filter>
+        </activity>
+
+        <receiver android:name="com.meig.logkit.LogKitReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_MOUNTED" />
+
+                <data android:scheme="file" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_UNMOUNTED" />
+
+                <data android:scheme="file" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.provider.Telephony.SECRET_CODE" />
+
+                <data
+                    android:host="3333"
+                    android:scheme="android_secret_code" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SERVICE_STOP" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SERVICE_START" />
+            </intent-filter>
+        </receiver>
+
+        <service android:name="com.meig.logkit.LogKitService" />
+
+        <activity android:name="com.meig.logkit.SettingsPrefence" />
+    </application>
+
+</manifest>
